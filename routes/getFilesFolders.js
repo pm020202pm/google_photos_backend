@@ -16,15 +16,15 @@ router.get('/list-files', async (req, res) => {
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
     const query = folderId
-      ? `'${folderId}' in parents and trashed = false`
-      : `'root' in parents and trashed = false`;
+  ? `'${folderId}' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'`
+  : `'root' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'`;
 
-    const result = await drive.files.list({
-      q: query,
-      fields: 'nextPageToken, files(id, name, mimeType, thumbnailLink, modifiedTime)',
-      pageToken,
-      pageSize: parseInt(pageSize),
-    });
+const result = await drive.files.list({
+  q: query,
+  fields: 'nextPageToken, files(id, name, mimeType, thumbnailLink, modifiedTime)',
+  pageToken,
+  pageSize: parseInt(pageSize),
+});
 
     console.log('Files listed:', result.data.files);
 
