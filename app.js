@@ -67,8 +67,10 @@ app.get('/oauth2callback', async (req, res) => {
     // TODO: Save refresh_token (safely) in your database for future use
     console.log('Access Token:', access_token);
     console.log('Refresh Token:', refresh_token);
+    const redirectUrl = `mydrive://auth/callback?accessToken=${access_token}&refreshToken=${refresh_token}`;
+    res.redirect(redirectUrl);
 
-    res.send('✅ Authentication successful! You can close this window.');
+    // res.send('✅ Authentication successful! You can close this window.');
   } catch (err) {
     console.error('Error exchanging code:', err.response?.data || err.message);
     res.status(500).send('Token exchange failed');

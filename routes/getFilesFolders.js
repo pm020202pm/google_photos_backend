@@ -21,7 +21,7 @@ router.get('/list-files', async (req, res) => {
 
     const result = await drive.files.list({
       q: query,
-      fields: 'nextPageToken, files(id, name, mimeType, thumbnailLink, modifiedTime, webViewLink)',
+      fields: 'nextPageToken, files(id, name, mimeType, thumbnailLink, modifiedTime)',
       pageToken,
       pageSize: parseInt(pageSize),
     });
