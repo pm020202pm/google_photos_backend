@@ -3,15 +3,17 @@ const uploadRoute = require('./routes/uploadFile');
 const listFilesRouter = require('./routes/getFilesFolders');
 const createFolderRouter = require('./routes/createFolder');
 const deleteFileRouter = require('./routes/delete-file');
+const authRoutes = require('./routes/auth');
 const qs = require('querystring');
 const axios = require('axios');
 const { oauth2Client, CLIENT_ID, REDIRECT_URI, CLIENT_SECRET } = require('./OAuth');
+const pool = require('./config/db');
 
 
 
 const app = express();
 app.use(express.json());
-
+app.use('/api/auth', authRoutes);
 app.use('/api', uploadRoute);
 app.use('/api', listFilesRouter);
 app.use('/api', createFolderRouter);
@@ -75,6 +77,14 @@ app.get('/oauth2callback', async (req, res) => {
     console.error('Error exchanging code:', err.response?.data || err.message);
     res.status(500).send('Token exchange failed');
   }
+});
+
+pool.query('SELECT NOW()', (err, res) => {
+    if (err) {
+        console.error(err);
+    } else {
+        console.log('Database time:', res.rows[0]);
+    }
 });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
