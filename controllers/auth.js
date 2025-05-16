@@ -16,18 +16,21 @@ const handleSendOtp = async (req, res) => {
 
 const handleLogin = async (req, res) => {
     const { email, otp, name} = req.body;
-    if (!email || !otp || !name) {
-        return res.status(400).json({ error: 'Email, Name and OTP are required' });
+    if (!email || !otp ) {
+        return res.status(400).json({ error: 'Email and OTP are required' });
     }
     try {
         const isValid = await verifyOtp(email, otp);
         if (isValid) {
             const photo_url = getPhotoUrl(email);
-            const query1 = 'SELECT * FROM users WHERE email=$1';
-            const result1 = await pool.query(query1, [email]);
             const token = jwt.sign({ email: email }, secretKey);
-            if (result1.rows.length > 0) {
-                return res.status(200).json({ message: 'User already exists', user: result1.rows[0], token:token });
+            if(!name){
+                const query1 = 'SELECT * FROM users WHERE email=$1';
+                const result1 = await pool.query(query1, [email]);
+                if (result1.rows.length > 0) {
+                    return res.status(200).json({ message: 'User already exists', user: result1.rows[0], token:token });
+                }
+                return res.status(404).json({ error: 'User Not Found' });
             }
             const query2 = `INSERT INTO users (email, name, photo_url) VALUES ($1, $2, $3) RETURNING *`;
             const result2 = await pool.query(query2, [email, name, photo_url]);
