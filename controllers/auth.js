@@ -25,6 +25,7 @@ const handleLogin = async (req, res) => {
             const photo_url = getPhotoUrl(email);
             const token = jwt.sign({ email: email }, secretKey);
             if(!name){
+                console.log('Name not provided');
                 const query1 = 'SELECT * FROM users WHERE email=$1';
                 const result1 = await pool.query(query1, [email]);
                 if (result1.rows.length > 0) {
