@@ -22,6 +22,9 @@ const handleLogin = async (req, res) => {
     try {
         const isValid = await verifyOtp(email, otp);
         if (isValid) {
+        
+            console.log(`User ${email} verified successfully`);
+            console.log(`User name is ${name}`);
             const photo_url = getPhotoUrl(email);
             const token = jwt.sign({ email: email }, secretKey);
             if(!name){
