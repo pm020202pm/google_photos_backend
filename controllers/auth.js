@@ -45,6 +45,9 @@ const handleLogin = async (req, res) => {
 }
 
 
+
+
+
 const getPhotoUrl = (emailId)=>{
     const url = `https://firebasestorage.googleapis.com/v0/b/traveldost-f6a2d.appspot.com/o/images%2F${emailId}?alt=media`;
     return url;
