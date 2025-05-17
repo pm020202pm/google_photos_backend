@@ -63,12 +63,8 @@ app.get('/oauth2callback', async (req, res) => {
       }),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
-
+    console.log('Token response:', tokenResponse.data);
     const { access_token, refresh_token, expires_in } = tokenResponse.data;
-
-    // TODO: Save refresh_token (safely) in your database for future use
-    console.log('Access Token:', access_token);
-    console.log('Refresh Token:', refresh_token);
     const redirectUrl = `mydrive://auth/callback?accessToken=${access_token}&refreshToken=${refresh_token}`;
     res.redirect(redirectUrl);
 
