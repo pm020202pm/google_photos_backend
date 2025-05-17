@@ -1,5 +1,6 @@
 const express = require('express');
 const { handleSendOtp, handleLogin } = require('../controllers/auth');
+const pool = require('../config/db');
 const router = express.Router();
 
 router.post('/requestotp', handleSendOtp); 
