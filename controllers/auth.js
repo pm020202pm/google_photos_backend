@@ -3,6 +3,8 @@ const pool = require('../config/db');
 const jwt = require('jsonwebtoken')
 require('dotenv').config();
 const secretKey = process.env.SECRET_KEY;
+
+
 const handleSendOtp = async (req, res) => {
     const { email } = req.body;
     try {
@@ -15,26 +17,19 @@ const handleSendOtp = async (req, res) => {
 }
 
 const handleLogin = async (req, res) => {
-    const { email, otp, name} = req.body;
+    const { email, otp, name=''} = req.body;
     if (!email || !otp ) {
         return res.status(400).json({ error: 'Email and OTP are required' });
     }
     try {
         const isValid = await verifyOtp(email, otp);
         if (isValid) {
-        
-            console.log(`User ${email} verified successfully`);
-            console.log(`User name is ${name}`);
             const photo_url = getPhotoUrl(email);
             const token = jwt.sign({ email: email }, secretKey);
-            if(!name){
-                console.log('Name not provided');
-                const query1 = 'SELECT * FROM users WHERE email=$1';
-                const result1 = await pool.query(query1, [email]);
-                if (result1.rows.length > 0) {
-                    return res.status(200).json({ message: 'User already exists', user: result1.rows[0], token:token });
-                }
-                return res.status(404).json({ error: 'User Not Found' });
+            const query1 = 'SELECT * FROM users WHERE email=$1';
+            const result1 = await pool.query(query1, [email]);
+            if (result1.rows.length > 0) {
+                return res.status(200).json({ message: 'User already exists', user: result1.rows[0], token:token });
             }
             const query2 = `INSERT INTO users (email, name, photo_url) VALUES ($1, $2, $3) RETURNING *`;
             const result2 = await pool.query(query2, [email, name, photo_url]);
@@ -49,25 +44,10 @@ const handleLogin = async (req, res) => {
     }
 }
 
-const checkUserExistence=async (req, res)=>{
-    const {email}=req.query;
-    try{
-        const query=`SELECT * FROM users WHERE email=$1`;
-        const result=await pool.query(query, [email]);
-        if(result.rowCount===0){
-            res.status(404).json({error: 'User not found'});
-        }
-        res.status(200).json({message: 'User found'});
-    }
-    catch(e){
-        console.error('Error in checking user existence:', e.message);
-        res.status(500).json({error: 'Internal Server Error'});
-    }
-}
 
 const getPhotoUrl = (emailId)=>{
     const url = `https://firebasestorage.googleapis.com/v0/b/traveldost-f6a2d.appspot.com/o/images%2F${emailId}?alt=media`;
     return url;
 }
 
-module.exports = { handleSendOtp, handleLogin, checkUserExistence, getPhotoUrl };
+module.exports = { handleSendOtp, handleLogin, getPhotoUrl };
