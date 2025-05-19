@@ -3,14 +3,14 @@ const router = express.Router();
 const pool = require('../config/db');
 
 router.post('/addAccount', async (req, res) => {
-    const { email, accountNo} = req.body;
+    const { email, accountNo, user_id} = req.body;
     console.log(email, accountNo);
     if (!email || !accountNo) {
         return res.status(400).json({ error: 'Email and account number are required' });
     }
-    const query = `INSERT INTO users (${accountNo}) VALUES ($1) RETURNING *`;
     try {
-        const result = await pool.query(query, [email]);
+        const query = `UPDATE users SET ${accountNo} = $1 WHERE user_id = $2 RETURNING *`;
+        const result = await pool.query(query, [email, user_id]);
         res.status(201).json({ user: result.rows[0] });
     } catch (err) {
         console.error(err);
