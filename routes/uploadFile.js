@@ -3,6 +3,7 @@ const multer = require('multer');
 const { google } = require('googleapis');
 const { Readable } = require('stream');
 const { oauth2Client } = require('../OAuth');
+const { getDriveFreeSpace } = require('../getFreeSpace');
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -40,6 +41,8 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     console.log('Refresh token 3:', refreshToken3);
     console.log('Refresh token 4:', refreshToken4);
     if(refreshTokens[0]!==undefined && refreshTokens[0]!==null && refreshTokens[0]!==''){
+      const freeSpace = await getDriveFreeSpace(refreshToken1);
+      console.log('Free space:', freeSpace);
       oauth2Client.setCredentials({ refresh_token: refreshToken1 });
       const drive = google.drive({ version: 'v3', auth: oauth2Client });
       const about = await drive.about.get({fields: 'storageQuota'});
