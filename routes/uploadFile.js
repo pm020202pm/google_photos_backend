@@ -30,7 +30,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       mimeType: req.file.mimetype,
       body: Readable.from(req.file.buffer),
     };
-    
+
     if(refreshTokens[0]!==undefined && refreshTokens[0]!==null && refreshTokens[0]!==''){
       const freeSpace  = await getDriveFreeSpace(refreshToken[0]);
       console.log('Free space:', freeSpace);
@@ -87,13 +87,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-const { google } = require('googleapis');
-
-const oauth2Client = new google.auth.OAuth2(
-  YOUR_CLIENT_ID,
-  YOUR_CLIENT_SECRET,
-  YOUR_REDIRECT_URI
-);
 
 /**
  * Returns the free available space in Google Drive in bytes
