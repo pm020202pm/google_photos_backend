@@ -30,29 +30,21 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       mimeType: req.file.mimetype,
       body: Readable.from(req.file.buffer),
     };
-    // Set refresh token
-    const refreshToken1 = refreshTokens[0];
-    const refreshToken2 = refreshTokens[1];
-    const refreshToken3 = refreshTokens[2];
-    const refreshToken4 = refreshTokens[3];
-    console.log('Refresh token 1:', refreshToken1);
-    console.log('Refresh token 2:', refreshToken2);
-    console.log('Refresh token 3:', refreshToken3);
-    console.log('Refresh token 4:', refreshToken4);
+    
     if(refreshTokens[0]!==undefined && refreshTokens[0]!==null && refreshTokens[0]!==''){
-      const freeSpace  = await getDriveFreeSpace(refreshToken1);
+      const freeSpace  = await getDriveFreeSpace(refreshToken[0]);
       console.log('Free space:', freeSpace);
     }
     if(refreshTokens[1]!==undefined && refreshTokens[1]!==null && refreshTokens[1]!==''){
-      const freeSpace  = await getDriveFreeSpace(refreshToken2);
+      const freeSpace  = await getDriveFreeSpace(refreshToken[1]);
       console.log('Free space:', freeSpace);
     }
     if(refreshTokens[2]!==undefined && refreshTokens[2]!==null && refreshTokens[2]!==''){
-      const freeSpace  = await getDriveFreeSpace(refreshToken3);
+      const freeSpace  = await getDriveFreeSpace(refreshToken[2]);
       console.log('Free space:', freeSpace);
     }
     if(refreshTokens[3]!==undefined && refreshTokens[3]!==null && refreshTokens[3]!==''){
-      const freeSpace  = await getDriveFreeSpace(refreshToken4);
+      const freeSpace  = await getDriveFreeSpace(refreshToken[3]);
       console.log('Free space:', freeSpace);
     }
     oauth2Client.setCredentials({ refresh_token: refreshToken });
