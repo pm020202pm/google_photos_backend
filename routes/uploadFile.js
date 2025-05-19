@@ -1,8 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { google } = require('googleapis');
 const { Readable } = require('stream');
-const { oauth2Client } = require('../OAuth');
 const { getDriveFreeSpace } = require('../getFreeSpace');
 const { uploadFileToDrive } = require('../uploadFileToDrive');
 const router = express.Router();
@@ -13,9 +11,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   const refreshTokens = req.body.refreshTokens.split(',');
   const user_id = req.body.user_id;
   const selectedEmails = req.body.selectedEmails.split(',');
-  console.log('Selected emails:', selectedEmails);
-  console.log('User ID:', user_id);
-  console.log('Refresh tokens:', refreshTokens);
   const folderId = req.body.folderId || undefined;
 
   try {
@@ -62,17 +57,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
         return res.status(200).json(file);
       }
     }
-    return res.status(400).send('No account has enough space to upload the file.');
-
-    // res.status(200).json({
-    //   message: '✅ File uploaded to user\'s Google Drive',
-    //   id: response.data.id,
-    //   name: response.data.name,
-    //   fileUrl: response.data.webViewLink,
-    //   thumbnailLink: response.data.thumbnailLink,
-    //   mimeType: response.data.mimeType,
-    //   modifiedTime: response.data.modifiedTime,
-    // });
+    return res.status(400).json({ error: 'Not enough free space in all accounts' });
   } catch (error) {
     console.error('❌ Upload error:', error.message);
     res.status(500).send('Upload failed: ' + error.message);

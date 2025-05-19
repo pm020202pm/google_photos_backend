@@ -39,10 +39,10 @@ async function uploadFileToDrive(refreshToken,user_id,selectedEmail, fileMetadat
       file.thumbnailLink,
       new Date().toISOString()
     ];
-    // const result = await pool.query(insertQuery, values);
-    // if (result.rowCount === 0) {
-    //   throw new Error('Failed to insert file metadata into database');
-    // }
+    const result = await pool.query(insertQuery, values);
+    if (result.rowCount === 0) {
+      throw new Error('Failed to insert file metadata into database');
+    }
     return response.data;
   } catch (error) {
     console.error('❌ Google Drive upload error:', error.message);
