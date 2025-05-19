@@ -20,7 +20,16 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   if (!refreshToken) return res.status(400).send('Missing refresh token.');
   
   try {
-    const fileSize = req.file.size; // ⬅️ File size in bytes
+    const fileSize = req.file.size;
+    const fileMetadata = {
+      name: req.file.originalname,
+      parents: folderId ? [folderId] : [],
+    };
+
+    const media = {
+      mimeType: req.file.mimetype,
+      body: Readable.from(req.file.buffer),
+    };
     // Set refresh token
     const refreshToken1 = refreshTokens[0];
     const refreshToken2 = refreshTokens[1];
@@ -31,59 +40,23 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     console.log('Refresh token 3:', refreshToken3);
     console.log('Refresh token 4:', refreshToken4);
     if(refreshTokens[0]!==undefined && refreshTokens[0]!==null && refreshTokens[0]!==''){
-      oauth2Client.setCredentials({ refresh_token: refreshToken1 });
-      const drive = google.drive({ version: 'v3', auth: oauth2Client });
-      const about = await drive.about.get({fields: 'storageQuota'});
-      const quota = about.data.storageQuota;
-      if (!quota.limit) {
-        throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
-      }
-      const free =  parseInt(quota.limit) - parseInt(quota.usage);
-      console.log('Free space:', free);
+      const freeSpace  = await getDriveFreeSpace(refreshToken1);
+      console.log('Free space:', freeSpace);
     }
     if(refreshTokens[1]!==undefined && refreshTokens[1]!==null && refreshTokens[1]!==''){
-      oauth2Client.setCredentials({ refresh_token: refreshToken2 });
-      const drive = google.drive({ version: 'v3', auth: oauth2Client });
-      const about = await drive.about.get({fields: 'storageQuota'});
-      const quota = about.data.storageQuota;
-      if (!quota.limit) {
-        throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
-      }
-      const free =  parseInt(quota.limit) - parseInt(quota.usage);
-      console.log('Free space:', free);
+      const freeSpace  = await getDriveFreeSpace(refreshToken2);
+      console.log('Free space:', freeSpace);
     }
     if(refreshTokens[2]!==undefined && refreshTokens[2]!==null && refreshTokens[2]!==''){
-      console.log('No refresh token found for user:', 3);
-      // return res.status(400).send('No refresh token found for user.');
+      const freeSpace  = await getDriveFreeSpace(refreshToken3);
+      console.log('Free space:', freeSpace);
     }
     if(refreshTokens[3]!==undefined && refreshTokens[3]!==null && refreshTokens[3]!==''){
-      console.log('No refresh token found for user:', 4);
-      // return res.status(400).send('No refresh token found for user.');
+      const freeSpace  = await getDriveFreeSpace(refreshToken4);
+      console.log('Free space:', freeSpace);
     }
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
-    // checking storage quota
-    const about = await drive.about.get({fields: 'storageQuota'});
-    const quota = about.data.storageQuota;
-    if (!quota.limit) {
-      throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
-    }
-    const free =  parseInt(quota.limit) - parseInt(quota.usage);
-    console.log('Free space:', free);
-    console.log('File size:', fileSize);
-
-    //////////////////////////////////
-
-    const fileMetadata = {
-      name: req.file.originalname,
-      parents: folderId ? [folderId] : [],
-    };
-
-    const media = {
-      mimeType: req.file.mimetype,
-      body: Readable.from(req.file.buffer),
-    };
-
     const response = await drive.files.create({
       resource: fileMetadata,
       media: media,
@@ -91,21 +64,21 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     });
     console.log('File uploaded:', response.data);
     const file = response.data;
-    // const insertQuery = `
-    //   INSERT INTO photos (
-    //     id, account_number, user_id, name, mime_type, modified_time, thumbnail_link, created_time
-    //   ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    // `;
-    // const values = [
-    //   file.id,
-    //   selectedEmail,
-    //   user_id,
-    //   file.name,
-    //   file.mimeType,
-    //   file.modifiedTime,
-    //   file.thumbnailLink,
-    //   new Date().toISOString()
-    // ];
+    const insertQuery = `
+      INSERT INTO photos (
+        id, account_number, user_id, name, mime_type, modified_time, thumbnail_link, created_time
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    `;
+    const values = [
+      file.id,
+      selectedEmails[0],
+      user_id,
+      file.name,
+      file.mimeType,
+      file.modifiedTime,
+      file.thumbnailLink,
+      new Date().toISOString()
+    ];
   
     res.status(200).json({
       message: '✅ File uploaded to user\'s Google Drive',
@@ -121,5 +94,36 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     res.status(500).send('Upload failed: ' + error.message);
   }
 });
+
+const { google } = require('googleapis');
+
+const oauth2Client = new google.auth.OAuth2(
+  YOUR_CLIENT_ID,
+  YOUR_CLIENT_SECRET,
+  YOUR_REDIRECT_URI
+);
+
+/**
+ * Returns the free available space in Google Drive in bytes
+ * @param {string} refreshToken - OAuth2 refresh token for the user
+ * @returns {Promise<number>} - Free space in bytes
+ */
+async function getDriveFreeSpace(refreshToken) {
+  try {
+    oauth2Client.setCredentials({ refresh_token: refreshToken });
+    const drive = google.drive({ version: 'v3', auth: oauth2Client });
+    const about = await drive.about.get({fields: 'storageQuota'});
+    const quota = about.data.storageQuota;
+    if (!quota.limit) {
+      throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
+    }
+    const free = parseInt(quota.limit)-parseInt(quota.usage);
+    return free;
+  } catch (error) {
+    console.error('❌ Failed to get Drive space:', error.message);
+    throw error;
+  }
+}
+
 
 module.exports = router;
