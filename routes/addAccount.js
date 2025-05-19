@@ -4,6 +4,7 @@ const pool = require('../config/db');
 
 router.post('/addAccount', async (req, res) => {
     const { email, accountNo} = req.body;
+    console.log(email, accountNo);
     if (!email) {
         return res.status(400).json({ error: 'Email and account number are required' });
     }
