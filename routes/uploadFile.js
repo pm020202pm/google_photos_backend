@@ -15,6 +15,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
 
   try {
     const fileSize = req.file.size;
+    console.log('File size:', fileSize);
     const fileMetadata = {
       name: req.file.originalname,
       parents: folderId ? [folderId] : [],
