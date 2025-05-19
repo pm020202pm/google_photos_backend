@@ -5,11 +5,8 @@ const pool = require('../config/db');
 router.post('/addAccount', async (req, res) => {
     const { email, accountNo} = req.body;
     console.log(email, accountNo);
-    if (!email) {
+    if (!email || !accountNo) {
         return res.status(400).json({ error: 'Email and account number are required' });
-    }
-    if (accountNo!=='account1' || accountNo!=='account2' || accountNo!=='account3' || accountNo!=='account4') {
-        return res.status(400).json({ error: 'Account number is required' });
     }
     const query = `INSERT INTO users (${accountNo}) VALUES ($1) RETURNING *`;
     try {
