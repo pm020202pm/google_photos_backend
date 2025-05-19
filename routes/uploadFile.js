@@ -35,7 +35,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       if(freeSpace >fileSize) {
         const file = await uploadFileToDrive(refreshTokens[0],user_id, selectedEmails[0], fileMetadata, media);
         console.log('File uploaded to account 1');
-        return res.status(200).json({file})
+        return res.status(200).json(file);
       }
     }
     if(refreshTokens[1]!==undefined && refreshTokens[1]!==null && refreshTokens[1]!==''){
@@ -43,7 +43,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       if(freeSpace >fileSize) {
         const file = await uploadFileToDrive(refreshTokens[1],user_id, selectedEmails[1], fileMetadata, media);
         console.log('File uploaded to account 2');
-        return res.status(200).json({file})
+        return res.status(200).json(file);
       }
     }
     if(refreshTokens[2]!==undefined && refreshTokens[2]!==null && refreshTokens[2]!==''){
@@ -51,7 +51,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       if(freeSpace >fileSize) {
         const file = await uploadFileToDrive(refreshTokens[2],user_id, selectedEmails[2], fileMetadata, media);
         console.log('File uploaded to account 3');
-        return res.status(200).json({file})
+        return res.status(200).json(file);
       }
     }
     if(refreshTokens[3]!==undefined && refreshTokens[3]!==null && refreshTokens[3]!==''){
@@ -59,7 +59,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       if(freeSpace >fileSize) {
         const file = await uploadFileToDrive(refreshTokens[3],user_id, selectedEmails[3], fileMetadata, media);
         console.log('File uploaded to account 4');
-        return res.status(200).json({file})
+        return res.status(200).json(file);
       }
     }
     return res.status(400).send('No account has enough space to upload the file.');
