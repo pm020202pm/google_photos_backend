@@ -7,15 +7,16 @@ const pool = require('./config/db');
 /**
  * Uploads a file to Google Drive using the user's refresh token.
  * @param {string} refreshToken - The user's refresh token
+ * @param {string} user_id - The user's ID
+ * @param {Array} selectedEmail - selected email address
  * @param {Object} fileMetadata - Metadata for the file (e.g., name, parents)
  * @param {Object} media - File media (e.g., mimeType, body)
  * @returns {Promise<Object>} - Google Drive file response
  */
-async function uploadFileToDrive(refreshToken, fileMetadata, media) {
+async function uploadFileToDrive(refreshToken,user_id,selectedEmail, fileMetadata, media) {
   try {
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
-
     const response = await drive.files.create({
       resource: fileMetadata,
       media: media,
@@ -30,7 +31,7 @@ async function uploadFileToDrive(refreshToken, fileMetadata, media) {
     `;
     const values = [
       file.id,
-      selectedEmails[0],
+      selectedEmail,
       user_id,
       file.name,
       file.mimeType,
