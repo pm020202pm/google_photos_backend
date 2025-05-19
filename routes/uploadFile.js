@@ -31,12 +31,26 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     console.log('Refresh token 3:', refreshToken3);
     console.log('Refresh token 4:', refreshToken4);
     if(refreshTokens[0]!==undefined && refreshTokens[0]!==null && refreshTokens[0]!==''){
-      console.log('No refresh token found for user:', 1);
-      // return res.status(400).send('No refresh token found for user.');
+      oauth2Client.setCredentials({ refresh_token: refreshToken1 });
+      const drive = google.drive({ version: 'v3', auth: oauth2Client });
+      const about = await drive.about.get({fields: 'storageQuota'});
+      const quota = about.data.storageQuota;
+      if (!quota.limit) {
+        throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
+      }
+      const free =  parseInt(quota.limit) - parseInt(quota.usage);
+      console.log('Free space:', free);
     }
     if(refreshTokens[1]!==undefined && refreshTokens[1]!==null && refreshTokens[1]!==''){
-      console.log('No refresh token found for user:', 2);
-      // return res.status(400).send('No refresh token found for user.');
+      oauth2Client.setCredentials({ refresh_token: refreshToken2 });
+      const drive = google.drive({ version: 'v3', auth: oauth2Client });
+      const about = await drive.about.get({fields: 'storageQuota'});
+      const quota = about.data.storageQuota;
+      if (!quota.limit) {
+        throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
+      }
+      const free =  parseInt(quota.limit) - parseInt(quota.usage);
+      console.log('Free space:', free);
     }
     if(refreshTokens[2]!==undefined && refreshTokens[2]!==null && refreshTokens[2]!==''){
       console.log('No refresh token found for user:', 3);
