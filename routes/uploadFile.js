@@ -3,7 +3,6 @@ const multer = require('multer');
 const { google } = require('googleapis');
 const { Readable } = require('stream');
 const { oauth2Client } = require('../OAuth');
-const { getDriveFreeSpace } = require('../getFreeSpace');
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -31,25 +30,61 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       mimeType: req.file.mimetype,
       body: Readable.from(req.file.buffer),
     };
-
+    // Set refresh token
+    const refreshToken1 = refreshTokens[0];
+    const refreshToken2 = refreshTokens[1];
+    const refreshToken3 = refreshTokens[2];
+    const refreshToken4 = refreshTokens[3];
+    console.log('Refresh token 1:', refreshToken1);
+    console.log('Refresh token 2:', refreshToken2);
+    console.log('Refresh token 3:', refreshToken3);
+    console.log('Refresh token 4:', refreshToken4);
     if(refreshTokens[0]!==undefined && refreshTokens[0]!==null && refreshTokens[0]!==''){
-      const freeSpace  = await getDriveFreeSpace(refreshToken[0]);
-      console.log('Free space:', freeSpace);
+      oauth2Client.setCredentials({ refresh_token: refreshToken1 });
+      const drive = google.drive({ version: 'v3', auth: oauth2Client });
+      const about = await drive.about.get({fields: 'storageQuota'});
+      const quota = about.data.storageQuota;
+      if (!quota.limit) {
+        throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
+      }
+      const free =  parseInt(quota.limit) - parseInt(quota.usage);
+      console.log('Free space:', free);
     }
     if(refreshTokens[1]!==undefined && refreshTokens[1]!==null && refreshTokens[1]!==''){
-      const freeSpace  = await getDriveFreeSpace(refreshToken[1]);
-      console.log('Free space:', freeSpace);
+      oauth2Client.setCredentials({ refresh_token: refreshToken2 });
+      const drive = google.drive({ version: 'v3', auth: oauth2Client });
+      const about = await drive.about.get({fields: 'storageQuota'});
+      const quota = about.data.storageQuota;
+      if (!quota.limit) {
+        throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
+      }
+      const free =  parseInt(quota.limit) - parseInt(quota.usage);
+      console.log('Free space:', free);
     }
     if(refreshTokens[2]!==undefined && refreshTokens[2]!==null && refreshTokens[2]!==''){
-      const freeSpace  = await getDriveFreeSpace(refreshToken[2]);
-      console.log('Free space:', freeSpace);
+      console.log('No refresh token found for user:', 3);
+      // return res.status(400).send('No refresh token found for user.');
     }
     if(refreshTokens[3]!==undefined && refreshTokens[3]!==null && refreshTokens[3]!==''){
-      const freeSpace  = await getDriveFreeSpace(refreshToken[3]);
-      console.log('Free space:', freeSpace);
+      console.log('No refresh token found for user:', 4);
+      // return res.status(400).send('No refresh token found for user.');
     }
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
+    // checking storage quota
+    const about = await drive.about.get({fields: 'storageQuota'});
+    const quota = about.data.storageQuota;
+    if (!quota.limit) {
+      throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
+    }
+    const free =  parseInt(quota.limit) - parseInt(quota.usage);
+    console.log('Free space:', free);
+    console.log('File size:', fileSize);
+
+    //////////////////////////////////
+
+    
+
     const response = await drive.files.create({
       resource: fileMetadata,
       media: media,
@@ -87,5 +122,36 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     res.status(500).send('Upload failed: ' + error.message);
   }
 });
+
+const { google } = require('googleapis');
+
+const oauth2Client = new google.auth.OAuth2(
+  YOUR_CLIENT_ID,
+  YOUR_CLIENT_SECRET,
+  YOUR_REDIRECT_URI
+);
+
+/**
+ * Returns the free available space in Google Drive in bytes
+ * @param {string} refreshToken - OAuth2 refresh token for the user
+ * @returns {Promise<number>} - Free space in bytes
+ */
+async function getDriveFreeSpace(refreshToken) {
+  try {
+    oauth2Client.setCredentials({ refresh_token: refreshToken });
+    const drive = google.drive({ version: 'v3', auth: oauth2Client });
+    const about = await drive.about.get({fields: 'storageQuota'});
+    const quota = about.data.storageQuota;
+    if (!quota.limit) {
+      throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
+    }
+    const free = parseInt(quota.limit)-parseInt(quota.usage);
+    return free;
+  } catch (error) {
+    console.error('❌ Failed to get Drive space:', error.message);
+    throw error;
+  }
+}
+
 
 module.exports = router;
