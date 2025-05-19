@@ -21,6 +21,22 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const fileSize = req.file.size; // ⬅️ File size in bytes
     // Set refresh token
+    if(!refreshTokens[0]){
+      console.log('No refresh token found for user:', user_id);
+      // return res.status(400).send('No refresh token found for user.');
+    }
+    if(!refreshTokens[1]){
+      console.log('No refresh token found for user:', user_id);
+      // return res.status(400).send('No refresh token found for user.');
+    }
+    if(!refreshTokens[2]){
+      console.log('No refresh token found for user:', user_id);
+      // return res.status(400).send('No refresh token found for user.');
+    }
+    if(!refreshTokens[3]){
+      console.log('No refresh token found for user:', user_id);
+      // return res.status(400).send('No refresh token found for user.');
+    }
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
     // checking storage quota
