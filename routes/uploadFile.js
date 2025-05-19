@@ -18,6 +18,17 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     // Set refresh token
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
+    // checking storage quota
+    const about = await drive.about.get({fields: 'storageQuota'});
+    const quota = about.data.storageQuota;
+    
+    if (!quota.limit) {
+      throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
+    }
+    const free =  parseInt(quota.limit) - parseInt(quota.usage);
+    console.log('Free space:', free);
+
+    //////////////////////////////////
 
     const fileMetadata = {
       name: req.file.originalname,
@@ -38,8 +49,8 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     const file = response.data;
     // const insertQuery = `
     //   INSERT INTO photos (
-    //     id, account_number, user_id, name, mime_type, modified_time, web_view_link, thumbnail_link, size, created_time
-    //   ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    //     id, account_number, user_id, name, mime_type, modified_time, thumbnail_link, created_time
+    //   ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     // `;
     // const values = [
     //   file.id,
@@ -48,10 +59,8 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     //   file.name,
     //   file.mimeType,
     //   file.modifiedTime,
-    //   file.webViewLink,
     //   file.thumbnailLink,
-    //   file.size,
-    //   file.createdTime
+    //   new Date().toISOString()
     // ];
   
     res.status(200).json({
