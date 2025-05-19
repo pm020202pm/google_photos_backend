@@ -11,6 +11,9 @@ router.post('/addAccount', async (req, res) => {
     try {
         const query = `UPDATE users SET ${accountNo} = $1 WHERE user_id = $2 RETURNING *`;
         const result = await pool.query(query, [email, user_id]);
+        if(result.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
         res.status(201).json({ user: result.rows[0] });
     } catch (err) {
         console.error(err);
