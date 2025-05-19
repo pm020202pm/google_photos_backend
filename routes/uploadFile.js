@@ -9,8 +9,12 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post('/upload', upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).send('No file uploaded.');
   const refreshToken = req.body.refreshToken;
+  const refreshTokens = req.body.refreshTokens;
   const user_id = req.body.user_id;
-  const selectedEmail = req.body.selectedEmail;
+  const selectedEmails = req.body.selectedEmails;
+  console.log('Selected emails:', selectedEmails);
+  console.log('User ID:', user_id);
+  console.log('Refresh tokens:', refreshTokens);
   const folderId = req.body.folderId || undefined;
   if (!refreshToken) return res.status(400).send('Missing refresh token.');
   
@@ -22,7 +26,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     // checking storage quota
     const about = await drive.about.get({fields: 'storageQuota'});
     const quota = about.data.storageQuota;
-    
     if (!quota.limit) {
       throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
     }
