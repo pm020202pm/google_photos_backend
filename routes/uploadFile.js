@@ -15,6 +15,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   if (!refreshToken) return res.status(400).send('Missing refresh token.');
   
   try {
+    const fileSize = req.file.size; // ⬅️ File size in bytes
     // Set refresh token
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
@@ -27,6 +28,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     }
     const free =  parseInt(quota.limit) - parseInt(quota.usage);
     console.log('Free space:', free);
+    console.log('File size:', fileSize);
 
     //////////////////////////////////
 
