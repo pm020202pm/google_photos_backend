@@ -36,32 +36,21 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     const refreshToken2 = refreshTokens[1];
     const refreshToken3 = refreshTokens[2];
     const refreshToken4 = refreshTokens[3];
-    console.log('Refresh token 1:', refreshToken1);
-    console.log('Refresh token 2:', refreshToken2);
-    console.log('Refresh token 3:', refreshToken3);
-    console.log('Refresh token 4:', refreshToken4);
     if(refreshTokens[0]!==undefined && refreshTokens[0]!==null && refreshTokens[0]!==''){
       const freeSpace = await getDriveFreeSpace(refreshTokens[0]);
       console.log('Free space:', freeSpace);
     }
     if(refreshTokens[1]!==undefined && refreshTokens[1]!==null && refreshTokens[1]!==''){
-      oauth2Client.setCredentials({ refresh_token: refreshToken2 });
-      const drive = google.drive({ version: 'v3', auth: oauth2Client });
-      const about = await drive.about.get({fields: 'storageQuota'});
-      const quota = about.data.storageQuota;
-      if (!quota.limit) {
-        throw new Error('Drive storage limit not available (might be unlimited or missing scope).');
-      }
-      const free =  parseInt(quota.limit) - parseInt(quota.usage);
-      console.log('Free space:', free);
+      const freeSpace = await getDriveFreeSpace(refreshTokens[1]);
+      console.log('Free space:', freeSpace);
     }
     if(refreshTokens[2]!==undefined && refreshTokens[2]!==null && refreshTokens[2]!==''){
-      console.log('No refresh token found for user:', 3);
-      // return res.status(400).send('No refresh token found for user.');
+      const freeSpace = await getDriveFreeSpace(refreshTokens[2]);
+      console.log('Free space:', freeSpace);
     }
     if(refreshTokens[3]!==undefined && refreshTokens[3]!==null && refreshTokens[3]!==''){
-      console.log('No refresh token found for user:', 4);
-      // return res.status(400).send('No refresh token found for user.');
+      const freeSpace = await getDriveFreeSpace(refreshTokens[3]);
+      console.log('Free space:', freeSpace);
     }
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
