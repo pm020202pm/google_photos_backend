@@ -17,7 +17,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   console.log('User ID:', user_id);
   console.log('Refresh tokens:', refreshTokens);
   const folderId = req.body.folderId || undefined;
-  if (!refreshToken) return res.status(400).send('Missing refresh token.');
   
   try {
     const fileSize = req.file.size;
