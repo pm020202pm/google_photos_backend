@@ -9,8 +9,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post('/upload', upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).send('No file uploaded.');
   const refreshToken = req.body.refreshToken;
-  if (!refreshToken) return res.status(400).send('Missing refresh token.');
+  const user_id = req.body.user_id;
+  const selectedEmail = req.body.selectedEmail;
   const folderId = req.body.folderId || undefined;
+  if (!refreshToken) return res.status(400).send('Missing refresh token.');
+  
   try {
     // Set refresh token
     oauth2Client.setCredentials({ refresh_token: refreshToken });
@@ -32,6 +35,24 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       fields: 'id, name, webViewLink, thumbnailLink, mimeType, modifiedTime'
     });
     console.log('File uploaded:', response.data);
+    const file = response.data;
+    // const insertQuery = `
+    //   INSERT INTO photos (
+    //     id, account_number, user_id, name, mime_type, modified_time, web_view_link, thumbnail_link, size, created_time
+    //   ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    // `;
+    // const values = [
+    //   file.id,
+    //   selectedEmail,
+    //   user_id,
+    //   file.name,
+    //   file.mimeType,
+    //   file.modifiedTime,
+    //   file.webViewLink,
+    //   file.thumbnailLink,
+    //   file.size,
+    //   file.createdTime
+    // ];
   
     res.status(200).json({
       message: '✅ File uploaded to user\'s Google Drive',
