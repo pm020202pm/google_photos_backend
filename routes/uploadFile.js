@@ -21,6 +21,14 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const fileSize = req.file.size; // ⬅️ File size in bytes
     // Set refresh token
+    const refreshToken1 = refreshTokens[0];
+    const refreshToken2 = refreshTokens[1];
+    const refreshToken3 = refreshTokens[2];
+    const refreshToken4 = refreshTokens[3];
+    console.log('Refresh token 1:', refreshToken1);
+    console.log('Refresh token 2:', refreshToken2);
+    console.log('Refresh token 3:', refreshToken3);
+    console.log('Refresh token 4:', refreshToken4);
     if(refreshTokens[0]===undefined || refreshTokens[0]===null || refreshTokens[0]===''){
       console.log('No refresh token found for user:', user_id);
       // return res.status(400).send('No refresh token found for user.');
