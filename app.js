@@ -4,6 +4,7 @@ const listFilesRouter = require('./routes/getFilesFolders');
 const createFolderRouter = require('./routes/createFolder');
 const deleteFileRouter = require('./routes/delete-file');
 const authRoutes = require('./routes/auth');
+const addAccountRouter = require('./routes/addAccount');
 const qs = require('querystring');
 const axios = require('axios');
 const { oauth2Client, CLIENT_ID, REDIRECT_URI, CLIENT_SECRET } = require('./OAuth');
@@ -18,6 +19,7 @@ app.use('/api', uploadRoute);
 app.use('/api', listFilesRouter);
 app.use('/api', createFolderRouter);
 app.use('/api', deleteFileRouter);
+app.use('/api', addAccountRouter);
 
 app.post('/api/get-access-token', async (req, res) => {
   const userRefreshToken = req.body.refreshToken;
@@ -37,7 +39,6 @@ app.get('/auth/google', (req, res) => {
     redirect_uri: REDIRECT_URI,
     response_type: 'code',
     scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email',
-    // scope: 'https://www.googleapis.com/auth/photoslibrary.readonly https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata',
     access_type: 'offline',
     prompt: 'consent',
   })}`;
