@@ -9,9 +9,10 @@ const upload = multer({ storage: multer.memoryStorage() });
 router.post('/upload', upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).send('No file uploaded.');
   const refreshToken = req.body.refreshToken;
-  const refreshTokens = req.body.refreshTokens;
+  // const refreshTokens = req.body.refreshTokens;
+  const refreshTokens = req.body.refreshTokens.split(',');
   const user_id = req.body.user_id;
-  const selectedEmails = req.body.selectedEmails;
+  const selectedEmails = req.body.selectedEmails.split(',');
   console.log('Selected emails:', selectedEmails);
   console.log('User ID:', user_id);
   console.log('Refresh tokens:', refreshTokens);
