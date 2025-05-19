@@ -29,7 +29,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     if(refreshTokens[0]!==undefined && refreshTokens[0]!==null && refreshTokens[0]!==''){
       const freeSpace = await getDriveFreeSpace(refreshTokens[0]);
       if(freeSpace >fileSize) {
-        const file = await uploadFileToDrive(refreshTokens[0],user_id, selectedEmails[0], fileMetadata, media);
+        const file = await uploadFileToDrive(refreshTokens[0],user_id, selectedEmails[0], fileMetadata, media, fileSize);
         console.log('File uploaded to account 1');
         return res.status(200).json(file);
       }
@@ -37,7 +37,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     if(refreshTokens[1]!==undefined && refreshTokens[1]!==null && refreshTokens[1]!==''){
       const freeSpace = await getDriveFreeSpace(refreshTokens[1]);
       if(freeSpace >fileSize) {
-        const file = await uploadFileToDrive(refreshTokens[1],user_id, selectedEmails[1], fileMetadata, media);
+        const file = await uploadFileToDrive(refreshTokens[1],user_id, selectedEmails[1], fileMetadata, media, fileSize);
         console.log('File uploaded to account 2');
         return res.status(200).json(file);
       }
@@ -45,7 +45,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     if(refreshTokens[2]!==undefined && refreshTokens[2]!==null && refreshTokens[2]!==''){
       const freeSpace = await getDriveFreeSpace(refreshTokens[2]);
       if(freeSpace >fileSize) {
-        const file = await uploadFileToDrive(refreshTokens[2],user_id, selectedEmails[2], fileMetadata, media);
+        const file = await uploadFileToDrive(refreshTokens[2],user_id, selectedEmails[2], fileMetadata, media, fileSize);
         console.log('File uploaded to account 3');
         return res.status(200).json(file);
       }
@@ -53,7 +53,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     if(refreshTokens[3]!==undefined && refreshTokens[3]!==null && refreshTokens[3]!==''){
       const freeSpace = await getDriveFreeSpace(refreshTokens[3]);
       if(freeSpace >fileSize) {
-        const file = await uploadFileToDrive(refreshTokens[3],user_id, selectedEmails[3], fileMetadata, media);
+        const file = await uploadFileToDrive(refreshTokens[3],user_id, selectedEmails[3], fileMetadata, media, fileSize);
         console.log('File uploaded to account 4');
         return res.status(200).json(file);
       }

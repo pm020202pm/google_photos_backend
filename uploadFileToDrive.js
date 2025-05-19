@@ -11,9 +11,10 @@ const pool = require('./config/db');
  * @param {Array} selectedEmail - selected email address
  * @param {Object} fileMetadata - Metadata for the file (e.g., name, parents)
  * @param {Object} media - File media (e.g., mimeType, body)
+ * @param {number} fileSize - Size of the file in bytes.
  * @returns {Promise<Object>} - Google Drive file response
  */
-async function uploadFileToDrive(refreshToken,user_id,selectedEmail, fileMetadata, media) {
+async function uploadFileToDrive(refreshToken,user_id,selectedEmail, fileMetadata, media, fileSize) {
   try {
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
@@ -22,8 +23,6 @@ async function uploadFileToDrive(refreshToken,user_id,selectedEmail, fileMetadat
       media: media,
       fields: 'id, name, webViewLink, thumbnailLink, mimeType, modifiedTime'
     });
-
-    console.log('File size:', media.body.length);
     const file = response.data;
     const insertQuery = `
       INSERT INTO photos (
@@ -39,7 +38,7 @@ async function uploadFileToDrive(refreshToken,user_id,selectedEmail, fileMetadat
       file.modifiedTime,
       file.thumbnailLink,
       new Date().toISOString(),
-      media.body.length
+      fileSize
     ];
     const result = await pool.query(insertQuery, values);
     if (result.rowCount === 0) {
