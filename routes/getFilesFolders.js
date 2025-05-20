@@ -1,6 +1,7 @@
 const express = require('express');
 const { google } = require('googleapis');
 const { oauth2Client } = require('../OAuth');
+const pool = require('../config/db');
 const router = express.Router();
 
 router.get('/list-files', async (req, res) => {
