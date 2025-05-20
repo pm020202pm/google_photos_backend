@@ -12,7 +12,7 @@ const pool = require('./config/db');
  * @param {Object} fileMetadata - Metadata for the file (e.g., name, parents)
  * @param {Object} media - File media (e.g., mimeType, body)
  * @param {number} fileSize - Size of the file in bytes.
- * @returns {Promise<Object>} - Google Drive file response
+ * @returns {Promise<Object>} - Row from the database after inserting file metadata
  */
 async function uploadFileToDrive(refreshToken,user_id,selectedEmail, fileMetadata, media, fileSize) {
   try {
@@ -34,6 +34,7 @@ async function uploadFileToDrive(refreshToken,user_id,selectedEmail, fileMetadat
     if (result.rowCount === 0) {
       throw new Error('Failed to insert file metadata into database');
     }
+    console.log('File uploaded and metadata inserted:', result.rows[0]);
     return result.rows[0];
   } catch (error) {
     console.error('❌ Google Drive upload error:', error.message);
