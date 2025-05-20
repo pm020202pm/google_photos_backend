@@ -27,7 +27,7 @@ async function uploadFileToDrive(refreshToken,user_id,selectedEmail, fileMetadat
     const insertQuery = `
       INSERT INTO photos (
         id, account_number, user_id, name, mime_type, modified_time, thumbnail_link, created_time, size
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
     `;
     const values = [file.id, selectedEmail, user_id, file.name, file.mimeType, file.modifiedTime, file.thumbnailLink, new Date().toISOString(),fileSize];
     const result = await pool.query(insertQuery, values);
