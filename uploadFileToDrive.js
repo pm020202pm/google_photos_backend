@@ -34,7 +34,7 @@ async function uploadFileToDrive(refreshToken,user_id,selectedEmail, fileMetadat
     if (result.rowCount === 0) {
       throw new Error('Failed to insert file metadata into database');
     }
-    return response.data;
+    return result.rows[0];
   } catch (error) {
     console.error('❌ Google Drive upload error:', error.message);
     throw new Error('Google Drive upload failed: ' + error.message);
