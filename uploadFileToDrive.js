@@ -29,17 +29,7 @@ async function uploadFileToDrive(refreshToken,user_id,selectedEmail, fileMetadat
         id, account_number, user_id, name, mime_type, modified_time, thumbnail_link, created_time, size
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `;
-    const values = [
-      file.id,
-      selectedEmail,
-      user_id,
-      file.name,
-      file.mimeType,
-      file.modifiedTime,
-      file.thumbnailLink,
-      new Date().toISOString(),
-      fileSize
-    ];
+    const values = [file.id, selectedEmail, user_id, file.name, file.mimeType, file.modifiedTime, file.thumbnailLink, new Date().toISOString(),fileSize];
     const result = await pool.query(insertQuery, values);
     if (result.rowCount === 0) {
       throw new Error('Failed to insert file metadata into database');

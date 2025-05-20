@@ -10,8 +10,6 @@ const axios = require('axios');
 const { oauth2Client, CLIENT_ID, REDIRECT_URI, CLIENT_SECRET } = require('./OAuth');
 const pool = require('./config/db');
 
-
-
 const app = express();
 app.use(express.json());
 app.use('/api/auth', authRoutes);
@@ -24,7 +22,6 @@ app.use('/api', addAccountRouter);
 app.post('/api/get-access-token', async (req, res) => {
   const userRefreshToken = req.body.refreshToken;
   oauth2Client.setCredentials({ refresh_token: userRefreshToken });
-
   try {
     const { token } = await oauth2Client.getAccessToken();
     res.json({ accessToken: token });

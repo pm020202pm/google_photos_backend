@@ -38,4 +38,23 @@ const result = await drive.files.list({
   }
 });
 
+router.get('/photos/:user_id', async (req, res) => {
+  try{
+    const { user_id} = req.params;
+    const {limit=20, page=1} = req.query;
+    const offset = (parseInt(page) - 1) * parseInt(limit);
+    const query = 'SELECT * FROM photos WHERE user_id=$1 ORDER BY modified_time DESC LIMIT $2 OFFSET $3';
+    const values = [user_id, limit, offset];
+    const result = await pool.query(query, values);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'No photos found' });
+    }
+    res.status(200).json({photos:result.rows});
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+})
+
 module.exports = router;
