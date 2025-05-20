@@ -28,6 +28,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       if(freeSpace >fileSize) {
         const file = await uploadFileToDrive(refreshTokens[i],user_id, selectedEmails[i], fileMetadata, media, fileSize);
         console.log(`File uploaded to ${selectedEmails[i]}`);
+        console.log('File metadata:', file);
         return res.status(200).json(file);
       }
     }
