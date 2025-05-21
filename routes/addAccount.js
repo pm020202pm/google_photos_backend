@@ -10,10 +10,11 @@ router.post('/addAccount', async (req, res) => {
     }
     try {
         const query = `UPDATE users SET ${accountNo} = $1 ${folderId ? ', shared_folder_id = $3' : ''} WHERE user_id = $2 RETURNING *;`;
+        const values = folderId ? [email, user_id, folderId] : [email, user_id];
         console.log(query);
         // const query = `UPDATE users SET ${accountNo} = $1 ${!folderId? '': ', shared_folder_id=$3'} WHERE user_id = $2 RETURNING *`;
         // const query = `UPDATE users SET ${accountNo} = $1 WHERE user_id = $2 RETURNING *`;
-        const result = await pool.query(query, [email, user_id]);
+        const result = await pool.query(query, values);
         if(result.rows.length === 0) {
             return res.status(404).json({ error: 'User not found' });
         }
