@@ -15,7 +15,7 @@ router.get('/list-files', async (req, res) => {
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     console.log(oauth2Client.credentials);
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
-
+    console.log(folderId)
     const query = folderId
   ? `'${folderId}' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'`
   : `'root' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'`;
