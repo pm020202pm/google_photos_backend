@@ -1,8 +1,8 @@
 const express = require('express');
-const uploadRoute = require('./routes/uploadFile');
+// const uploadRoute = require('./routes/uploadFile');
 const listFilesRouter = require('./routes/getFilesFolders');
-const createFolderRouter = require('./routes/createFolder');
-const deleteFileRouter = require('./routes/delete-file');
+// const createFolderRouter = require('./routes/createFolder');
+// const deleteFileRouter = require('./routes/delete-file');
 const authRoutes = require('./routes/auth');
 const addAccountRouter = require('./routes/addAccount');
 const qs = require('querystring');
@@ -13,10 +13,10 @@ const pool = require('./config/db');
 const app = express();
 app.use(express.json());
 app.use('/api/auth', authRoutes);
-app.use('/api', uploadRoute);
+// app.use('/api', uploadRoute);
 app.use('/api', listFilesRouter);
-app.use('/api', createFolderRouter);
-app.use('/api', deleteFileRouter);
+// app.use('/api', createFolderRouter);
+// app.use('/api', deleteFileRouter);
 app.use('/api', addAccountRouter);
 
 app.post('/api/get-access-token', async (req, res) => {
