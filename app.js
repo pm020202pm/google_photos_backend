@@ -35,8 +35,9 @@ app.get('/auth/google', (req, res) => {
     client_id: CLIENT_ID,
     redirect_uri: REDIRECT_URI,
     response_type: 'code',
-    scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email',
+    scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.email',
     access_type: 'offline',
+    include_granted_scopes: true,
     prompt: 'consent',
   })}`;
   res.redirect(authUrl);
