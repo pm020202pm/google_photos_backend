@@ -42,6 +42,7 @@ app.get('/auth/google', (req, res) => {
   })}`;
   res.redirect(authUrl);
 });
+
 app.get('/oauth2callback', async (req, res) => {
   const { code } = req.query;
 
@@ -50,7 +51,6 @@ app.get('/oauth2callback', async (req, res) => {
   }
 
   try {
-    // Exchange authorization code for access + refresh token
     const tokenResponse = await axios.post(
       'https://oauth2.googleapis.com/token',
       qs.stringify({
@@ -62,12 +62,40 @@ app.get('/oauth2callback', async (req, res) => {
       }),
       { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
     );
-    console.log('Token response:', tokenResponse.data);
     const { access_token, refresh_token, expires_in } = tokenResponse.data;
     const redirectUrl = `mydrive://auth/callback?accessToken=${access_token}&refreshToken=${refresh_token}`;
-    res.redirect(redirectUrl);
+    res.send(`
+  <html>
+    <head>
+      <title>Redirecting...</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          text-align: center;
+        }
+        .message {
+          margin-bottom: 20px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="message">Authentication successful! Redirecting to the app...</div>
+      <script>
+        setTimeout(() => {
+          window.location.href = "${redirectUrl}";
+        }, 1500); // Delay for 1.5 seconds
+      </script>
+    </body>
+  </html>
+`);
 
-    // res.send('✅ Authentication successful! You can close this window.');
+    // res.redirect(redirectUrl);
   } catch (err) {
     console.error('Error exchanging code:', err.response?.data || err.message);
     res.status(500).send('Token exchange failed');
