@@ -37,7 +37,7 @@ const router = express.Router();
 // });
 
 
-router.get('/list-recent-files', async (req, res) => {
+router.get('/list-files', async (req, res) => {
   const { folderId, pageToken, pageSize = 10, refreshToken, modifiedAfter } = req.query;
 
   if (!refreshToken) {
