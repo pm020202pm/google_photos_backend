@@ -4,21 +4,62 @@ const { oauth2Client } = require('../OAuth');
 const pool = require('../config/db');
 const router = express.Router();
 
-router.get('/list-files', async (req, res) => {
-  const { folderId, pageToken, pageSize = 10, refreshToken } = req.query;
+// router.get('/list-files', async (req, res) => {
+//   const { folderId, pageToken, pageSize = 10, refreshToken } = req.query;
+
+//   if (!refreshToken) {
+//     return res.status(400).json({ error: 'Missing accessToken in query' });
+//   }
+
+//   try {
+//     oauth2Client.setCredentials({ refresh_token: refreshToken });
+//     console.log(oauth2Client.credentials);
+//     const drive = google.drive({ version: 'v3', auth: oauth2Client });
+//     console.log(folderId)
+//     const query = 
+//     folderId ? `'${folderId}' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'` : `'root' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'`;
+
+//     const result = await drive.files.list({
+//       q: query,
+//       fields: 'nextPageToken, files(id, name, mimeType, thumbnailLink, modifiedTime, createdTime, owners(emailAddress))',
+//       orderBy: 'modifiedTime desc',
+//       pageToken,
+//       pageSize: parseInt(pageSize),
+//     });
+//     res.status(200).json({
+//       files: result.data.files,
+//       nextPageToken: result.data.nextPageToken || null,
+//     });
+//   } catch (error) {
+//     console.error('❌ Error listing files:', error.message);
+//     res.status(500).json({ error: 'Failed to fetch files' });
+//   }
+// });
+
+
+router.get('/list-recent-files', async (req, res) => {
+  const { folderId, pageToken, pageSize = 10, refreshToken, modifiedAfter } = req.query;
 
   if (!refreshToken) {
-    return res.status(400).json({ error: 'Missing accessToken in query' });
+    return res.status(400).json({ error: 'Missing refreshToken in query' });
   }
 
   try {
     oauth2Client.setCredentials({ refresh_token: refreshToken });
-    console.log(oauth2Client.credentials);
     const drive = google.drive({ version: 'v3', auth: oauth2Client });
-    console.log(folderId)
-    const query = folderId
-      ? `'${folderId}' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'`
-      : `'root' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'`;
+
+    // ISO date string required
+    let modifiedTimeFilter = '';
+    if (modifiedAfter) {
+      const isoDate = new Date(modifiedAfter).toISOString(); // ensure proper format
+      modifiedTimeFilter = ` and modifiedTime > '${isoDate}'`;
+    }
+
+    const query = (folderId
+      ? `'${folderId}' in parents`
+      : `'root' in parents`)
+      + ` and trashed = false and mimeType != 'application/vnd.google-apps.folder'`
+      + modifiedTimeFilter;
 
     const result = await drive.files.list({
       q: query,
@@ -28,16 +69,16 @@ router.get('/list-files', async (req, res) => {
       pageSize: parseInt(pageSize),
     });
 
-
     res.status(200).json({
       files: result.data.files,
       nextPageToken: result.data.nextPageToken || null,
     });
   } catch (error) {
-    console.error('❌ Error listing files:', error.message);
-    res.status(500).json({ error: 'Failed to fetch files' });
+    console.error('❌ Error listing recent files:', error.message);
+    res.status(500).json({ error: 'Failed to fetch recent files' });
   }
 });
+
 
 // router.get('/photos/:user_id', async (req, res) => {
 //   try{
